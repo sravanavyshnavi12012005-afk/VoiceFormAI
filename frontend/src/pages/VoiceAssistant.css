@@ -1,0 +1,54 @@
+.voice-page{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    min-height:100vh;
+    background:#f4f7fb;
+    padding:30px;
+}
+
+.voice-page h1{
+    font-size:48px;
+    margin-bottom:15px;
+}
+
+.voice-page p{
+    color:#666;
+    font-size:20px;
+}
+
+.mic-button{
+    margin-top:35px;
+    background:#2563eb;
+    color:white;
+    border:none;
+    border-radius:50px;
+    padding:18px 35px;
+    font-size:22px;
+    cursor:pointer;
+}
+
+.mic-button:hover{
+    background:#1d4ed8;
+}
+
+.speech-box{
+    margin-top:40px;
+    width:70%;
+    min-height:150px;
+    background:white;
+    border-radius:15px;
+    box-shadow:0 5px 15px rgba(0,0,0,.1);
+    padding:25px;
+    font-size:22px;
+}
+pre{
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 70%;
+  margin-top: 20px;
+  text-align: left;
+  overflow-x: auto;
+}
