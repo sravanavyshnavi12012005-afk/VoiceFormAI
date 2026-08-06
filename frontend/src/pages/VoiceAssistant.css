@@ -52,3 +52,34 @@ pre{
   text-align: left;
   overflow-x: auto;
 }
+.pdf-button {
+  margin-top: 20px;
+  padding: 12px 25px;
+  background: #0d6efd;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: 0.3s;
+}
+
+.pdf-button:hover {
+  background: #0b5ed7;
+}
+/* Progress Bar */
+
+.progress-container {
+  width: 80%;
+  height: 12px;
+  background: #ddd;
+  border-radius: 10px;
+  margin: 20px auto;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(to right, #4caf50, #2196f3);
+  transition: width 0.5s ease;
+}
