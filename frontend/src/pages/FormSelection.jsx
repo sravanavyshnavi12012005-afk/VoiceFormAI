@@ -14,21 +14,38 @@ function FormSelection() {
 
   const selectForm = (form) => {
     navigate("/voice", {
-      state: { form },
+      state: {
+        form: form,
+      },
     });
   };
 
   return (
-    <div className="form-selection">
-      <h1>Select a Form</h1>
+    <div className="form-selection-page">
 
-      <div className="form-grid">
-        {forms.map((form) => (
-          <button key={form} onClick={() => selectForm(form)}>
-            {form}
-          </button>
-        ))}
+      <div className="form-selection-container">
+
+        <h1>📝 Select a Form</h1>
+
+        <p>
+          Choose the form you want to complete using your voice.
+        </p>
+
+        <div className="form-grid">
+
+          {forms.map((form) => (
+            <button
+              key={form}
+              onClick={() => selectForm(form)}
+            >
+              {form}
+            </button>
+          ))}
+
+        </div>
+
       </div>
+
     </div>
   );
 }

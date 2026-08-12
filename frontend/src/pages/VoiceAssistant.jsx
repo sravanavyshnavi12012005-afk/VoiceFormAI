@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { jsPDF } from "jspdf";
 import "./VoiceAssistant.css";
 
 function VoiceAssistant() {
+
   const location = useLocation();
+  const navigate = useNavigate();
 
   const form = location.state?.form || "Passport";
 
@@ -18,21 +20,42 @@ function VoiceAssistant() {
   const [loading, setLoading] = useState(true);
   const [completed, setCompleted] = useState(false);
 
-  // Progress Percentage
+  // =========================================================
+  // GET LOGGED-IN USER
+  // =========================================================
+
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  // If user is not logged in, go to login
+  useEffect(() => {
+
+    if (!user) {
+      navigate("/login");
+    }
+
+  }, [navigate]);
+
+  // =========================================================
+  // PROGRESS
+  // =========================================================
+
   const progress =
     questions.length > 0
       ? ((currentQuestion + 1) / questions.length) * 100
       : 0;
 
-  // ===========================
-  // Speak Question
-  // ===========================
+  // =========================================================
+  // SPEAK QUESTION
+  // =========================================================
+
   const speakQuestion = (text) => {
+
     if (!text) return;
 
     window.speechSynthesis.cancel();
 
-    const utterance = new SpeechSynthesisUtterance(text);
+    const utterance =
+      new SpeechSynthesisUtterance(text);
 
     utterance.lang = "en-IN";
     utterance.rate = 1;
@@ -45,44 +68,75 @@ function VoiceAssistant() {
     window.speechSynthesis.speak(utterance);
   };
 
-  // ===========================
-  // Fetch Questions
-  // ===========================
+  // =========================================================
+  // FETCH QUESTIONS
+  // =========================================================
+
   useEffect(() => {
+
     axios
-      .get(`http://127.0.0.1:8000/questions/${encodeURIComponent(form)}`)
+      .get(
+        `http://127.0.0.1:8000/questions/${encodeURIComponent(form)}`
+      )
       .then((response) => {
+
         setQuestions(response.data.questions);
         setLoading(false);
+
       })
       .catch((error) => {
-        console.error(error);
+
+        console.error(
+          "Error loading questions:",
+          error
+        );
+
         setLoading(false);
+
       });
+
   }, [form]);
 
-  // ===========================
-  // Speak Next Question
-  // ===========================
-  useEffect(() => {
-    if (questions.length > 0 && currentQuestion !== 0) {
-      speakQuestion(questions[currentQuestion]);
-    }
-  }, [currentQuestion]);
+  // =========================================================
+  // SPEAK NEXT QUESTION
+  // =========================================================
 
-  // ===========================
-  // Speech Recognition
-  // ===========================
+  useEffect(() => {
+
+    if (
+      questions.length > 0 &&
+      currentQuestion !== 0
+    ) {
+
+      speakQuestion(
+        questions[currentQuestion]
+      );
+
+    }
+
+  }, [currentQuestion, questions]);
+
+  // =========================================================
+  // START LISTENING
+  // =========================================================
+
   const startListening = () => {
+
     const SpeechRecognition =
-      window.SpeechRecognition || window.webkitSpeechRecognition;
+      window.SpeechRecognition ||
+      window.webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
-      alert("Speech Recognition is not supported.");
+
+      alert(
+        "Speech Recognition is not supported in this browser."
+      );
+
       return;
     }
 
-    const recognition = new SpeechRecognition();
+    const recognition =
+      new SpeechRecognition();
 
     recognition.lang = "en-IN";
     recognition.interimResults = false;
@@ -92,16 +146,26 @@ function VoiceAssistant() {
 
     setSpeech("🎤 Listening...");
 
+    // =======================================================
+    // SPEECH RESULT
+    // =======================================================
+
     recognition.onresult = (event) => {
-      const transcript = event.results[0][0].transcript.trim();
+
+      const transcript =
+        event.results[0][0]
+          .transcript
+          .trim();
 
       if (!transcript) {
+
         const message =
           "Sorry, I didn't catch that. Please repeat your answer.";
 
         setSpeech(message);
 
-        const utterance = new SpeechSynthesisUtterance(message);
+        const utterance =
+          new SpeechSynthesisUtterance(message);
 
         utterance.lang = "en-IN";
 
@@ -109,7 +173,9 @@ function VoiceAssistant() {
           startListening();
         };
 
-        window.speechSynthesis.speak(utterance);
+        window.speechSynthesis.speak(
+          utterance
+        );
 
         return;
       }
@@ -118,168 +184,354 @@ function VoiceAssistant() {
 
       const updatedAnswers = {
         ...answers,
-        [questions[currentQuestion]]: transcript,
+        [questions[currentQuestion]]:
+          transcript
       };
 
       setAnswers(updatedAnswers);
 
-      if (currentQuestion < questions.length - 1) {
-        setCurrentQuestion((prev) => prev + 1);
-      } else {
-        axios
-          .post("http://127.0.0.1:8000/submit", {
-            form: form,
-            answers: updatedAnswers,
-          })
-          .then(() => {
-            console.log("Form saved successfully!");
-          })
-          .catch((error) => {
-            console.error("Error saving form:", error);
-          });
+      // =====================================================
+      // NEXT QUESTION
+      // =====================================================
 
-        window.speechSynthesis.speak(
-          new SpeechSynthesisUtterance(
-            "Congratulations! You have completed the form."
-          )
+      if (
+        currentQuestion <
+        questions.length - 1
+      ) {
+
+        setCurrentQuestion(
+          (prev) => prev + 1
         );
 
-        alert("✅ Form Completed!");
-        setCompleted(true);
+      }
+
+      // =====================================================
+      // FINAL QUESTION
+      // =====================================================
+
+      else {
+
+        submitForm(updatedAnswers);
       }
     };
 
+    // =======================================================
+    // SPEECH ERROR
+    // =======================================================
+
     recognition.onerror = (event) => {
+
       let message = "";
 
       if (event.error === "no-speech") {
+
         message =
           "Sorry, I didn't hear anything. Please say your answer again.";
-      } else if (event.error === "audio-capture") {
-        message = "Microphone not detected. Please check your microphone.";
-      } else if (event.error === "not-allowed") {
-        message = "Microphone permission denied.";
-      } else {
-        message = "I couldn't understand. Please repeat your answer.";
+
+      }
+      else if (event.error === "audio-capture") {
+
+        message =
+          "Microphone not detected. Please check your microphone.";
+
+      }
+      else if (event.error === "not-allowed") {
+
+        message =
+          "Microphone permission denied.";
+
+      }
+      else {
+
+        message =
+          "I couldn't understand. Please repeat your answer.";
+
       }
 
       setSpeech(message);
 
-      const utterance = new SpeechSynthesisUtterance(message);
+      const utterance =
+        new SpeechSynthesisUtterance(message);
 
       utterance.lang = "en-IN";
 
       utterance.onend = () => {
+
         if (
           event.error !== "audio-capture" &&
           event.error !== "not-allowed"
         ) {
+
           startListening();
+
         }
+
       };
 
-      window.speechSynthesis.speak(utterance);
+      window.speechSynthesis.speak(
+        utterance
+      );
     };
   };
 
-  // ===========================
-  // Download PDF
-  // ===========================
+  // =========================================================
+  // SUBMIT FORM
+  // =========================================================
+
+  const submitForm = async (finalAnswers) => {
+
+    try {
+
+      const currentUser =
+        JSON.parse(
+          localStorage.getItem("user")
+        );
+
+      if (!currentUser) {
+
+        alert(
+          "Your login session was not found. Please login again."
+        );
+
+        navigate("/login");
+
+        return;
+      }
+
+      await axios.post(
+        "http://127.0.0.1:8000/submit",
+        {
+          form: form,
+          answers: finalAnswers,
+          user_email: currentUser.email
+        }
+      );
+
+      console.log(
+        "Form saved successfully!"
+      );
+
+      setCompleted(true);
+
+      window.speechSynthesis.cancel();
+
+      const message =
+        "Congratulations! You have completed the form.";
+
+      const utterance =
+        new SpeechSynthesisUtterance(message);
+
+      utterance.lang = "en-IN";
+
+      window.speechSynthesis.speak(
+        utterance
+      );
+
+      alert(
+        "✅ Form Completed Successfully!"
+      );
+
+      // =====================================================
+      // GO TO DASHBOARD
+      // =====================================================
+
+      navigate("/dashboard");
+
+    }
+    catch (error) {
+
+      console.error(
+        "Error saving form:",
+        error
+      );
+
+      alert(
+        "❌ Unable to save the form. Please make sure the backend is running."
+      );
+
+    }
+  };
+
+  // =========================================================
+  // DOWNLOAD PDF
+  // =========================================================
+
   const downloadPDF = () => {
+
     const doc = new jsPDF();
 
     doc.setFontSize(20);
-    doc.text("VoiceForm AI", 20, 20);
+
+    doc.text(
+      "VoiceForm AI",
+      20,
+      20
+    );
 
     doc.setFontSize(16);
-    doc.text(`${form} Form`, 20, 35);
+
+    doc.text(
+      `${form} Form`,
+      20,
+      35
+    );
 
     doc.setFontSize(12);
 
     let y = 50;
 
-    Object.entries(answers).forEach(([question, answer], index) => {
-      doc.text(`${index + 1}. ${question}`, 20, y);
-      y += 8;
+    Object.entries(answers)
+      .forEach(
+        ([question, answer], index) => {
 
-      doc.text(`Answer: ${answer}`, 25, y);
-      y += 15;
+          doc.text(
+            `${index + 1}. ${question}`,
+            20,
+            y
+          );
 
-      if (y > 270) {
-        doc.addPage();
-        y = 20;
-      }
-    });
+          y += 8;
 
-    doc.save(`${form}_Form.pdf`);
+          doc.text(
+            `Answer: ${answer}`,
+            25,
+            y
+          );
+
+          y += 15;
+
+          if (y > 270) {
+
+            doc.addPage();
+
+            y = 20;
+          }
+        }
+      );
+
+    doc.save(
+      `${form}_Form.pdf`
+    );
   };
 
-  // ===========================
-  // Loading
-  // ===========================
+  // =========================================================
+  // LOADING
+  // =========================================================
+
   if (loading) {
+
     return (
       <div className="voice-page">
-        <h2>Loading questions...</h2>
+        <h2>
+          Loading questions...
+        </h2>
       </div>
     );
   }
 
-  // ===========================
-  // No Questions
-  // ===========================
+  // =========================================================
+  // NO QUESTIONS
+  // =========================================================
+
   if (questions.length === 0) {
+
     return (
       <div className="voice-page">
-        <h2>No questions found for "{form}"</h2>
+        <h2>
+          No questions found for "{form}"
+        </h2>
       </div>
     );
   }
+
+  // =========================================================
+  // PAGE
+  // =========================================================
 
   return (
     <div className="voice-page">
-      <h1>🎤 VoiceForm AI</h1>
 
-      <h2>{form}</h2>
+      <h1>
+        🎤 VoiceForm AI
+      </h1>
 
-      {/* Progress Bar */}
+      <h2>
+        {form}
+      </h2>
+
+      {/* Progress */}
+
       <div className="progress-container">
+
         <div
           className="progress-bar"
-          style={{ width: `${progress}%` }}
-        ></div>
+          style={{
+            width: `${progress}%`
+          }}
+        />
+
       </div>
 
-      <p>{Math.round(progress)}% Completed</p>
-
       <p>
-        Question {currentQuestion + 1} of {questions.length}
+        {Math.round(progress)}% Completed
       </p>
 
-      <h3>{questions[currentQuestion]}</h3>
+      <p>
+        Question {currentQuestion + 1} of{" "}
+        {questions.length}
+      </p>
+
+      <h3>
+        {questions[currentQuestion]}
+      </h3>
 
       <button
         className="mic-button"
-        onClick={() => speakQuestion(questions[currentQuestion])}
+        onClick={() =>
+          speakQuestion(
+            questions[currentQuestion]
+          )
+        }
+        disabled={completed}
       >
         🎤 Start Voice Assistant
       </button>
 
       <div className="speech-box">
-        <strong>Your Answer:</strong>
+
+        <strong>
+          Your Answer:
+        </strong>
+
         <br />
+
         {speech}
+
       </div>
 
-      <h3>Collected Answers</h3>
+      <h3>
+        Collected Answers
+      </h3>
 
-      <pre>{JSON.stringify(answers, null, 2)}</pre>
+      <pre>
+        {JSON.stringify(
+          answers,
+          null,
+          2
+        )}
+      </pre>
 
       {completed && (
-        <button className="pdf-button" onClick={downloadPDF}>
+
+        <button
+          className="pdf-button"
+          onClick={downloadPDF}
+        >
           📄 Download PDF
         </button>
+
       )}
+
     </div>
   );
 }

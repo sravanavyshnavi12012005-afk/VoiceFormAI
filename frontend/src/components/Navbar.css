@@ -62,3 +62,15 @@
     gap: 20px;
   }
 }
+.nav-feature-button {
+  background: none;
+  border: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  padding: 0;
+}
+
+.nav-feature-button:hover {
+  color: #2563eb;
+}
