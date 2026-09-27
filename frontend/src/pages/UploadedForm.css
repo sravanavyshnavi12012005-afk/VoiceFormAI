@@ -1,0 +1,98 @@
+.uploaded-form-page {
+  min-height: 80vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 50px 20px;
+}
+
+.uploaded-form-card {
+  width: 100%;
+  max-width: 850px;
+  background: white;
+  padding: 40px;
+  border-radius: 15px;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.12);
+}
+
+.uploaded-form-card h1 {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.file-info {
+  padding: 20px;
+  background: #f5f7fb;
+  border-radius: 10px;
+  margin-bottom: 25px;
+}
+
+.file-info p {
+  margin-bottom: 0;
+  margin-top: 10px;
+  font-weight: bold;
+  word-break: break-word;
+}
+
+.analyze-button {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 8px;
+  background: #2563eb;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.analyze-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.status-message {
+  text-align: center;
+  margin: 20px 0;
+  font-weight: bold;
+}
+
+.extracted-section {
+  margin-top: 30px;
+}
+
+.extracted-section h2 {
+  margin-bottom: 15px;
+}
+
+.extracted-text {
+  min-height: 200px;
+  max-height: 500px;
+  overflow-y: auto;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background: #fafafa;
+  white-space: pre-wrap;
+  line-height: 1.6;
+}
+
+.continue-button {
+  width: 100%;
+  margin-top: 20px;
+  padding: 14px;
+  border: none;
+  border-radius: 8px;
+  background: #16a34a;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.back-button {
+  display: block;
+  margin: 25px auto 0;
+  padding: 10px 18px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}

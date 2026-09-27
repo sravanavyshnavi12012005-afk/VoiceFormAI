@@ -13,26 +13,26 @@ function FormSelection() {
   ];
 
   const selectForm = (form) => {
-    navigate("/voice", {
-      state: {
-        form: form,
-      },
+    navigate("/language", {
+      state: { form },
     });
   };
 
-  return (
-    <div className="form-selection-page">
+  const uploadOwnForm = () => {
+    navigate("/upload-form");
+  };
 
-      <div className="form-selection-container">
+  return (
+    <div className="form-page">
+      <div className="form-container">
 
         <h1>📝 Select a Form</h1>
 
         <p>
-          Choose the form you want to complete using your voice.
+          Choose the form you want to complete using VoiceForm AI.
         </p>
 
         <div className="form-grid">
-
           {forms.map((form) => (
             <button
               key={form}
@@ -42,10 +42,15 @@ function FormSelection() {
             </button>
           ))}
 
+          {/* Upload your own PDF */}
+          <button
+            onClick={uploadOwnForm}
+          >
+            📄 Upload My Own Form
+          </button>
         </div>
 
       </div>
-
     </div>
   );
 }

@@ -12,8 +12,10 @@ import Dashboard from "./pages/Dashboard";
 import FormSelection from "./pages/FormSelection";
 import VoiceAssistant from "./pages/VoiceAssistant";
 import History from "./pages/History";
-
+import LanguageSelection from "./pages/LanguageSelection";
+import UploadForm from "./pages/UploadForm";
 import "./App.css";
+import UploadedForm from "./pages/UploadedForm";
 
 function App() {
   return (
@@ -24,7 +26,6 @@ function App() {
       ========================= */}
 
       <Navbar />
-
 
       {/* =========================
           APPLICATION ROUTES
@@ -45,7 +46,24 @@ function App() {
           path="/about"
           element={<About />}
         />
-
+        <Route
+          path="/upload-form"
+          element={
+          <ProtectedRoute>
+            <UploadForm />
+             </ProtectedRoute>
+            }
+            
+        />
+        <Route
+         path="/uploaded-form"
+         element={
+         <ProtectedRoute>
+          <UploadedForm />
+          </ProtectedRoute>
+        }
+        />
+ 
         <Route
           path="/contact"
           element={<Contact />}
@@ -61,9 +79,21 @@ function App() {
           element={<Register />}
         />
 
+        {/* =========================
+            LANGUAGE SELECTION
+        ========================= */}
+
+        <Route
+          path="/language"
+          element={
+            <ProtectedRoute>
+              <LanguageSelection />
+            </ProtectedRoute>
+          }
+        />
 
         {/* =========================
-            PROTECTED DASHBOARD
+            DASHBOARD
         ========================= */}
 
         <Route
@@ -75,9 +105,8 @@ function App() {
           }
         />
 
-
         {/* =========================
-            PROTECTED FORM SELECTION
+            FORM SELECTION
         ========================= */}
 
         <Route
@@ -89,9 +118,22 @@ function App() {
           }
         />
 
+        {/* =========================
+            VOICE ASSISTANT
+        ========================= */}
+
+        <Route
+          path="/voice-assistant"
+          element={
+            <ProtectedRoute>
+              <VoiceAssistant />
+            </ProtectedRoute>
+          }
+        />
 
         {/* =========================
-            PROTECTED VOICE ASSISTANT
+            OLD VOICE URL
+            Keeps previous links working
         ========================= */}
 
         <Route
@@ -103,9 +145,8 @@ function App() {
           }
         />
 
-
         {/* =========================
-            PROTECTED HISTORY
+            FORM HISTORY
         ========================= */}
 
         <Route
@@ -117,7 +158,9 @@ function App() {
           }
         />
 
-        {/* Keep old submissions URL working */}
+        {/* =========================
+            OLD SUBMISSIONS URL
+        ========================= */}
 
         <Route
           path="/submissions"
