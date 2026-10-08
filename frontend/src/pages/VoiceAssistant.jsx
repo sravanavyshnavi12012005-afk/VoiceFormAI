@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { jsPDF } from "jspdf";
 import "./VoiceAssistant.css";
-
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 function VoiceAssistant() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -357,11 +357,11 @@ const form =
     setLoading(true);
 
     axios
-      .get(
-        `http://127.0.0.1:8000/questions/${encodeURIComponent(
-          form
-        )}`
-      )
+  .get(
+    `${API_BASE_URL}/questions/${encodeURIComponent(
+      form
+    )}`
+   )
       .then((response) => {
         const englishQuestions =
           response.data.questions || [];
@@ -569,7 +569,7 @@ const form =
       }
 
       await axios.post(
-        "http://127.0.0.1:8000/submit",
+        `${API_BASE_URL}/submit`,
         {
           form: form,
           answers: finalAnswers,

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import "./SubmissionHistory.css";
-
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 function SubmissionHistory() {
   const [submissions, setSubmissions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -9,7 +9,7 @@ function SubmissionHistory() {
 
   useEffect(() => {
     axios
-      .get("http://127.0.0.1:8000/submissions")
+      .get("${API_BASE_URL}/submissions")
       .then((response) => {
         setSubmissions(response.data);
         setLoading(false);

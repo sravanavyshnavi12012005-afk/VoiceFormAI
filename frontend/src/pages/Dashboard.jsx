@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./Dashboard.css";
-
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 function Dashboard() {
   const navigate = useNavigate();
 
@@ -31,7 +31,7 @@ function Dashboard() {
 
     axios
       .get(
-        `http://127.0.0.1:8000/submissions/${encodeURIComponent(
+        `${API_BASE_URL}/submissions/${encodeURIComponent(
           loggedInUser.email
         )}`
       )

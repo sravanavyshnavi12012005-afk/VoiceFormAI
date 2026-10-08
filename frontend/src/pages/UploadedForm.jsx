@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./UploadedForm.css";
-
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 function UploadedForm() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -42,7 +42,7 @@ function UploadedForm() {
       setMessage("🔍 Analyzing your form...");
 
       const response = await axios.get(
-        `http://127.0.0.1:8000/analyze-form/${encodeURIComponent(
+        `${API_BASE_URL}/analyze-form/${encodeURIComponent(
           fileName
         )}`
       );

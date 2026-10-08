@@ -2,7 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./UploadForm.css";
-
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 function UploadForm() {
   const navigate = useNavigate();
 
@@ -39,7 +39,7 @@ function UploadForm() {
       formData.append("file", file);
 
       const response = await axios.post(
-        "http://127.0.0.1:8000/upload-form",
+        "${API_BASE_URL}/upload-form",
         formData,
         {
           headers: {

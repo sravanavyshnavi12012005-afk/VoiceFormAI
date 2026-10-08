@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./History.css";
-
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 function History() {
   const navigate = useNavigate();
 
@@ -27,7 +27,7 @@ function History() {
 
     axios
       .get(
-        `http://127.0.0.1:8000/submissions/${encodeURIComponent(
+        `${API_BASE_URL}/submissions/${encodeURIComponent(
           user.email
         )}`
       )
