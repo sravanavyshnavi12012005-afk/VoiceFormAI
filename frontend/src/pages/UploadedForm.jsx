@@ -7,10 +7,18 @@ function UploadedForm() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const fileName = location.state?.fileName;
+  // =========================================================
+  // UPLOADED FILE INFORMATION
+  // =========================================================
+
+  const fileName = location.state?.fileName || "";
 
   const originalFileName =
     location.state?.originalFileName || fileName;
+
+  // =========================================================
+  // STATE
+  // =========================================================
 
   const [text, setText] = useState("");
   const [fields, setFields] = useState([]);
@@ -19,15 +27,17 @@ function UploadedForm() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
-  const analyzeForm = async () => {
+  // =========================================================
+  // ANALYZE UPLOADED FORM
+  // =========================================================
 
+  const analyzeForm = async () => {
     if (!fileName) {
       setMessage("❌ Uploaded form information was not found.");
       return;
     }
 
     try {
-
       setLoading(true);
       setMessage("🔍 Analyzing your form...");
 
@@ -37,12 +47,15 @@ function UploadedForm() {
         )}`
       );
 
-      setText(response.data.extracted_text);
+      // Extracted PDF text
+      setText(response.data.extracted_text || "");
 
+      // Detected fields
       setFields(
         response.data.detected_fields || []
       );
 
+      // Generated questions
       setQuestions(
         response.data.questions || []
       );
@@ -52,7 +65,6 @@ function UploadedForm() {
       );
 
     } catch (error) {
-
       console.error(
         "Form analysis error:",
         error
@@ -64,14 +76,15 @@ function UploadedForm() {
       );
 
     } finally {
-
       setLoading(false);
-
     }
   };
 
-  const continueToVoiceAssistant = () => {
+  // =========================================================
+  // CONTINUE TO VOICE ASSISTANT
+  // =========================================================
 
+  const continueToVoiceAssistant = () => {
     if (questions.length === 0) {
       alert(
         "No form fields were detected."
@@ -79,35 +92,49 @@ function UploadedForm() {
       return;
     }
 
+    // Get selected language
+    const selectedLanguage =
+      localStorage.getItem("selectedLanguage") ||
+      "English";
+
+    // IMPORTANT:
+    // Send uploadedForm = true
+    // Send the uploaded questions
+    // Send the uploaded PDF file name
+    // VoiceAssistant will use these instead of Passport questions
+
     navigate("/voice-assistant", {
-
       state: {
-
         uploadedForm: true,
+
+        form: "Uploaded Form",
 
         fileName: fileName,
 
-        originalFileName:
-          originalFileName,
+        originalFileName: originalFileName,
 
-        questions: questions
+        questions: questions,
 
-      }
-
+        language: selectedLanguage,
+      },
     });
-
   };
 
-  return (
+  // =========================================================
+  // UI
+  // =========================================================
 
+  return (
     <div className="uploaded-form-page">
 
       <div className="uploaded-form-card">
 
+        {/* PAGE TITLE */}
         <h1>
           📄 Your Uploaded Form
         </h1>
 
+        {/* FILE INFORMATION */}
         <div className="file-info">
 
           <strong>
@@ -120,28 +147,26 @@ function UploadedForm() {
 
         </div>
 
+        {/* ANALYZE BUTTON */}
         <button
           className="analyze-button"
           onClick={analyzeForm}
           disabled={loading || !fileName}
         >
-
           {loading
             ? "Analyzing Form..."
             : "🔍 Read & Analyze Form"}
-
         </button>
 
+        {/* STATUS MESSAGE */}
         {message && (
-
           <p className="status-message">
             {message}
           </p>
-
         )}
 
+        {/* DETECTED FIELDS */}
         {fields.length > 0 && (
-
           <div className="detected-section">
 
             <h2>
@@ -152,25 +177,22 @@ function UploadedForm() {
 
               {fields.map(
                 (field, index) => (
-
                   <div
                     className="field-item"
                     key={index}
                   >
                     {index + 1}. {field}
                   </div>
-
                 )
               )}
 
             </div>
 
           </div>
-
         )}
 
+        {/* GENERATED QUESTIONS */}
         {questions.length > 0 && (
-
           <div className="questions-section">
 
             <h2>
@@ -179,40 +201,34 @@ function UploadedForm() {
 
             {questions.map(
               (question, index) => (
-
                 <div
                   className="question-item"
                   key={index}
                 >
-
                   <strong>
                     {index + 1}.
                   </strong>{" "}
 
                   {question}
-
                 </div>
-
               )
             )}
 
+            {/* START VOICE FORM */}
             <button
               className="continue-button"
               onClick={
                 continueToVoiceAssistant
               }
             >
-
               🎤 Start Voice Form Filling
-
             </button>
 
           </div>
-
         )}
 
+        {/* EXTRACTED PDF TEXT */}
         {text && (
-
           <details className="text-section">
 
             <summary>
@@ -224,24 +240,21 @@ function UploadedForm() {
             </div>
 
           </details>
-
         )}
 
+        {/* BACK BUTTON */}
         <button
           className="back-button"
           onClick={() =>
             navigate("/forms")
           }
         >
-
           ← Back to Forms
-
         </button>
 
       </div>
 
     </div>
-
   );
 }
 

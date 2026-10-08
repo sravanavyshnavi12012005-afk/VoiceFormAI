@@ -12,11 +12,13 @@ function VoiceAssistant() {
   // FORM
   // =========================================================
 
-const uploadedForm = location.state?.uploadedForm || false;
+const uploadedForm =
+  location.state?.uploadedForm || false;
 
-const uploadedQuestions = location.state?.questions || [];
-
-const form = location.state?.form || "Passport";
+const form =
+  uploadedForm
+    ? "Uploaded Form"
+    : location.state?.form || "Passport";
   // =========================================================
   // GET SELECTED LANGUAGE
   // =========================================================
@@ -351,47 +353,41 @@ const form = location.state?.form || "Passport";
   // FETCH QUESTIONS
   // =========================================================
 
- useEffect(() => {
+  useEffect(() => {
+    setLoading(true);
 
-  // ==========================================
-  // UPLOADED PDF FORM
-  // ==========================================
+    axios
+      .get(
+        `http://127.0.0.1:8000/questions/${encodeURIComponent(
+          form
+        )}`
+      )
+      .then((response) => {
+        const englishQuestions =
+          response.data.questions || [];
 
-  if (uploadedForm && uploadedQuestions.length > 0) {
+        const translatedQuestions =
+          getQuestionsForLanguage(
+            englishQuestions
+          );
 
-    setQuestions(uploadedQuestions);
-    setLoading(false);
+        setQuestions(
+          translatedQuestions
+        );
 
-    return;
-  }
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error(
+          "Error loading questions:",
+          error
+        );
 
-  // ==========================================
-  // NORMAL PREDEFINED FORM
-  // ==========================================
+        setQuestions([]);
+        setLoading(false);
+      });
+  }, [form, selectedLanguage]);
 
-  axios
-    .get(
-      `http://127.0.0.1:8000/questions/${encodeURIComponent(form)}`
-    )
-    .then((response) => {
-
-      setQuestions(response.data.questions);
-
-      setLoading(false);
-
-    })
-    .catch((error) => {
-
-      console.error(
-        "Error loading questions:",
-        error
-      );
-
-      setLoading(false);
-
-    });
-
-}, [form, uploadedForm, uploadedQuestions]);
   // =========================================================
   // SPEAK NEXT QUESTION
   // =========================================================
